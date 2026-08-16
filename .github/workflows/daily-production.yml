@@ -1,0 +1,136 @@
+name: Daily Video Production
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 07:00 UTC daily
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build videos without uploading'
+        type: boolean
+        default: false
+      limit:
+        description: 'How many lessons to produce'
+        type: string
+        default: '1'
+
+# A production run outlasts the gap between a manual dispatch and the daily
+# schedule; two concurrent runs would race each other pushing the content plan.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write   # needed only by the final commit step
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Restore OAuth credentials
+        env:
+          CLIENT_SECRET_B64: ${{ secrets.CLIENT_SECRET_B64 }}
+          CREDENTIALS_B64: ${{ secrets.CREDENTIALS_B64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CREDENTIALS_B64:-}" ]; then
+            echo "::error::CREDENTIALS_B64 secret is not set."
+            exit 1
+          fi
+          # Read from env rather than interpolating secrets into the script body,
+          # so nothing secret can end up in the shell trace or the run log.
+          printf '%s' "$CLIENT_SECRET_B64" | base64 -d > client_secrets.json
+          printf '%s' "$CREDENTIALS_B64"   | base64 -d > credentials.json
+          chmod 600 client_secrets.json credentials.json
+          python -c "import json;json.load(open('credentials.json'))" \
+            || { echo "::error::CREDENTIALS_B64 did not decode to valid JSON."; exit 1; }
+          echo "Credentials restored."
+
+      - name: Preflight
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PRIVACY_STATUS: ${{ vars.PRIVACY_STATUS || 'unlisted' }}
+        run: python scripts/preflight.py
+
+      - name: Produce and publish
+        id: run
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PRIVACY_STATUS: ${{ vars.PRIVACY_STATUS || 'unlisted' }}
+          SERIES_NAME: ${{ vars.SERIES_NAME || 'Build With AI' }}
+          SERIES_TOPIC: ${{ vars.SERIES_TOPIC }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: python main.py --limit "${{ inputs.limit || '1' }}"
+
+      - name: Remove credentials from the workspace
+        if: always()
+        run: rm -f client_secrets.json credentials.json
+
+      - name: Upload finished videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-${{ github.run_id }}
+          path: output/*.mp4
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Commit updated content plan
+        if: steps.run.outcome == 'success' && !inputs.dry_run
+        run: |
+          set -euo pipefail
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # The run is long enough that the default branch can move underneath it,
+          # which would make a plain push a non-fast-forward. content_plan.json is a
+          # generated artifact, so replay this run's copy onto whatever HEAD is now.
+          STAGING=$(mktemp -d)
+          cp content_plan.json "$STAGING/"
+
+          for attempt in 1 2 3; do
+            git fetch origin "${GITHUB_REF_NAME}"
+            git reset --hard "origin/${GITHUB_REF_NAME}"
+            cp "$STAGING/content_plan.json" content_plan.json
+
+            git add content_plan.json
+            if git diff --cached --quiet; then
+              echo "Nothing to commit."
+              exit 0
+            fi
+
+            git commit -m "chore: advance content plan after production run"
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "Pushed on attempt ${attempt}."
+              exit 0
+            fi
+            echo "Push rejected on attempt ${attempt}, retrying..."
+          done
+
+          echo "::error::Could not push the updated content plan after 3 attempts."
+          exit 1

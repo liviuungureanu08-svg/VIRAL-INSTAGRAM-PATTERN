@@ -1,0 +1,38 @@
+# --- Secrets: never commit anything below -----------------------------------
+client_secrets.json
+credentials.json
+**/client_secrets.json
+**/credentials.json
+*.env
+.env
+.env.*
+!.env.example
+# Base64-encoded credential blobs are still credentials.
+encoded_*.txt
+*_secret*.json
+*_secrets*.json
+*-service-account*.json
+token.json
+token.pickle
+
+# --- Build output -----------------------------------------------------------
+output/
+*.mp4
+*.wav
+*.mp3
+!assets/music/bg_music.mp3
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+
+# --- Editors / OS -----------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store

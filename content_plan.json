@@ -1,0 +1,60 @@
+{
+  "lessons": [
+    {
+      "chapter": "Foundations",
+      "part": 1,
+      "title": "What a Large Language Model Actually Does When You Press Enter",
+      "status": "pending",
+      "youtube_id": null
+    },
+    {
+      "chapter": "Foundations",
+      "part": 2,
+      "title": "Tokens, Context Windows, and Why Your Long Prompt Got Truncated",
+      "status": "pending",
+      "youtube_id": null
+    },
+    {
+      "chapter": "Foundations",
+      "part": 3,
+      "title": "Temperature and Sampling: Controlling How Random the Output Is",
+      "status": "pending",
+      "youtube_id": null
+    },
+    {
+      "chapter": "Working With Models",
+      "part": 4,
+      "title": "Prompt Engineering That Survives Contact With Real Users",
+      "status": "pending",
+      "youtube_id": null
+    },
+    {
+      "chapter": "Working With Models",
+      "part": 5,
+      "title": "Structured Output: Getting Reliable JSON Out of a Language Model",
+      "status": "pending",
+      "youtube_id": null
+    },
+    {
+      "chapter": "Retrieval",
+      "part": 6,
+      "title": "Embeddings Explained Without the Linear Algebra",
+      "status": "pending",
+      "youtube_id": null
+    },
+    {
+      "chapter": "Retrieval",
+      "part": 7,
+      "title": "Building Your First RAG Pipeline and Where It Will Break",
+      "status": "pending",
+      "youtube_id": null
+    },
+    {
+      "chapter": "Agents",
+      "part": 8,
+      "title": "Tool Calling: How a Model Decides to Run Your Function",
+      "status": "pending",
+      "youtube_id": null
+    }
+  ]
+}
