@@ -1,0 +1,126 @@
+name: Analyze Reference Video
+
+# Fetching runs here rather than locally because the analysis environment has no
+# egress to YouTube. This job pulls the video on a runner, reduces it to a small
+# set of derived artifacts, and commits those back — the source file itself is
+# never committed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Video URL to analyse'
+        required: true
+        type: string
+      slug:
+        description: 'Folder name under reference/ (default: derived from title)'
+        required: false
+        type: string
+      sample_fps:
+        description: 'Frames sampled per second (raise for fast-cut edits)'
+        required: false
+        default: '2'
+        type: string
+      commit:
+        description: 'Commit the analysis back to this branch'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg
+
+      - name: Install analysis dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-analysis.txt
+
+      - name: Fetch reference video
+        env:
+          REFERENCE_URL: ${{ inputs.url }}
+          REFERENCE_SLUG: ${{ inputs.slug }}
+        run: |
+          set -euo pipefail
+          if [ -n "${REFERENCE_SLUG:-}" ]; then
+            python scripts/fetch_reference.py "$REFERENCE_URL" --slug "$REFERENCE_SLUG"
+          else
+            python scripts/fetch_reference.py "$REFERENCE_URL"
+          fi
+
+      - name: Analyze
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          found=0
+          for video in reference/*/source.mp4 reference/*/source.mkv reference/*/source.webm; do
+            echo "::group::$video"
+            python scripts/analyze_video.py "$video" --sample-fps "${{ inputs.sample_fps }}"
+            echo "::endgroup::"
+            found=1
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "::error::No downloaded video found under reference/."
+            exit 1
+          fi
+
+      - name: Summarise
+        run: |
+          {
+            echo "## Reference analysis"
+            for report in reference/*/REPORT.md; do
+              [ -f "$report" ] || continue
+              cat "$report"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload analysis artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reference-analysis-${{ github.run_id }}
+          path: |
+            reference/**/analysis.json
+            reference/**/REPORT.md
+            reference/**/contact_sheet.jpg
+            reference/**/frames/**
+            reference/**/metadata.json
+            reference/**/transcript.txt
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Commit analysis
+        if: inputs.commit
+        run: |
+          set -euo pipefail
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # Source media is gitignored; only the derived artifacts are added.
+          git add --all reference/
+          if git diff --cached --quiet; then
+            echo "No analysis changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: add reference analysis for ${{ inputs.url }}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

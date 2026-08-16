@@ -22,6 +22,23 @@ output/
 *.mp3
 !assets/music/bg_music.mp3
 
+# --- Reference material -----------------------------------------------------
+# Downloaded source media stays local: it is large, and it is somebody else's
+# copyrighted work. Only the derived analysis is committed.
+reference/**/source.*
+reference/**/*.vtt
+reference/**/*.srt
+reference/**/*.part
+reference/**/*.webm
+reference/**/*.mkv
+# ...but the analysis artifacts must be tracked.
+!reference/**/analysis.json
+!reference/**/metadata.json
+!reference/**/transcript.txt
+!reference/**/REPORT.md
+!reference/**/contact_sheet.jpg
+!reference/**/frames/
+
 # --- Python -----------------------------------------------------------------
 __pycache__/
 *.py[cod]

@@ -1,0 +1,12 @@
+# Reference-video analysis only — not needed to run the production pipeline.
+#   pip install -r requirements-analysis.txt
+
+# Video/metadata/caption fetching
+yt-dlp>=2025.1.1
+
+# Frame analysis
+numpy>=1.26
+Pillow>=10.4.0
+
+# Supplies an ffmpeg binary when the system has none
+imageio-ffmpeg>=0.5.1
