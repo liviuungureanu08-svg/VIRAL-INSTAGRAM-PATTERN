@@ -57,19 +57,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-analysis.txt
 
+      # Runs first and independently: it needs only googleapis.com, so it still
+      # succeeds when the video download is refused (YouTube blocks datacenter
+      # IPs with a bot check). A failed download should not cost us the metadata.
+      - name: Fetch metadata via Data API
+        id: metadata
+        continue-on-error: true
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          REFERENCE_URL: ${{ inputs.url }}
+          REFERENCE_SLUG: ${{ inputs.slug }}
+        run: |
+          set -euo pipefail
+          if [ -z "${YOUTUBE_API_KEY:-}" ]; then
+            echo "YOUTUBE_API_KEY not set — skipping metadata."
+            exit 0
+          fi
+          python scripts/fetch_metadata.py "$REFERENCE_URL" ${REFERENCE_SLUG:+--slug "$REFERENCE_SLUG"}
+
       - name: Fetch reference video
+        id: fetch
+        continue-on-error: true
         env:
           REFERENCE_URL: ${{ inputs.url }}
           REFERENCE_SLUG: ${{ inputs.slug }}
         run: |
           set -euo pipefail
-          if [ -n "${REFERENCE_SLUG:-}" ]; then
-            python scripts/fetch_reference.py "$REFERENCE_URL" --slug "$REFERENCE_SLUG"
-          else
-            python scripts/fetch_reference.py "$REFERENCE_URL"
-          fi
+          python scripts/fetch_reference.py "$REFERENCE_URL" ${REFERENCE_SLUG:+--slug "$REFERENCE_SLUG"}
 
       - name: Analyze
+        if: steps.fetch.outcome == 'success'
         run: |
           set -euo pipefail
           shopt -s nullglob
@@ -86,41 +103,67 @@ jobs:
           fi
 
       - name: Summarise
+        if: always()
         run: |
           {
-            echo "## Reference analysis"
-            for report in reference/*/REPORT.md; do
+            for report in reference/*/METADATA.md reference/*/REPORT.md; do
               [ -f "$report" ] || continue
               cat "$report"
+              echo
             done
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload analysis artifact
+      - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: reference-analysis-${{ github.run_id }}
           path: |
             reference/**/analysis.json
             reference/**/REPORT.md
+            reference/**/METADATA.md
             reference/**/contact_sheet.jpg
             reference/**/frames/**
             reference/**/metadata.json
             reference/**/transcript.txt
           retention-days: 30
-          if-no-files-found: error
+          # 'warn', not 'error': a bot-check refusal leaves metadata only, and
+          # that is still worth keeping.
+          if-no-files-found: warn
 
-      - name: Commit analysis
-        if: inputs.commit
+      # Runs even when the download failed, so metadata survives a bot-check
+      # refusal instead of being discarded with the rest of the run.
+      - name: Commit results
+        if: always() && inputs.commit
         run: |
           set -euo pipefail
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # Source media is gitignored; only the derived artifacts are added.
+          # Source media is gitignored; only derived artifacts are added.
           git add --all reference/
           if git diff --cached --quiet; then
-            echo "No analysis changes to commit."
+            echo "Nothing to commit."
             exit 0
           fi
-          git commit -m "chore: add reference analysis for ${{ inputs.url }}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git commit -m "chore: reference data for ${{ inputs.url }}"
+
+          for attempt in 1 2 3; do
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            echo "Push rejected on attempt ${attempt}, rebasing..."
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+          done
+          echo "::error::Could not push results after 3 attempts."
+          exit 1
+
+      # Both fetch steps are continue-on-error so their partial output survives.
+      # Report the true outcome here rather than letting the run claim success.
+      - name: Report outcome
+        if: always()
+        run: |
+          echo "metadata: ${{ steps.metadata.outcome }}"
+          echo "video   : ${{ steps.fetch.outcome }}"
+          if [ "${{ steps.fetch.outcome }}" != "success" ]; then
+            echo "::error::Video download failed. YouTube commonly refuses GitHub runners with 'Sign in to confirm you're not a bot' — check the fetch step's log. Any metadata retrieved has still been saved."
+            exit 1
+          fi

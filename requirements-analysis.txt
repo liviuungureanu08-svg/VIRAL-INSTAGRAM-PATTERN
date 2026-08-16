@@ -4,6 +4,9 @@
 # Video/metadata/caption fetching
 yt-dlp>=2025.1.1
 
+# YouTube Data API metadata (scripts/fetch_metadata.py)
+requests>=2.32.3
+
 # Frame analysis
 numpy>=1.26
 Pillow>=10.4.0
