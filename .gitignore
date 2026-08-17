@@ -53,3 +53,9 @@ env/
 .vscode/
 .idea/
 .DS_Store
+
+# --- Studio -----------------------------------------------------------------
+# Third-party transcripts used for structural measurement stay local; only the
+# derived profile is committed.
+studio/corpus/*.txt
+studio/examples/out/

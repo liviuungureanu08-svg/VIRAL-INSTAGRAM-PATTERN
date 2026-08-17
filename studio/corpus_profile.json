@@ -1,0 +1,48 @@
+{
+  "sample_size": 2,
+  "words": {
+    "min": 2084,
+    "max": 2577,
+    "mean": 2330
+  },
+  "runtime_minutes": {
+    "min": 13.9,
+    "max": 17.2
+  },
+  "mean_sentence_words": 13.8,
+  "short_sentence_ratio": 0.142,
+  "present_tense_signal": 0.571,
+  "named_people_per_episode": 2.5,
+  "beat_frequency": {
+    "1": "2/2",
+    "2": "2/2",
+    "3": "2/2",
+    "4": "2/2",
+    "5": "2/2",
+    "6": "1/2",
+    "7": "2/2",
+    "8": "2/2",
+    "9": "1/2",
+    "10": "2/2",
+    "11": "1/2",
+    "12": "2/2",
+    "13": "2/2"
+  },
+  "invariant_beats": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    8,
+    10,
+    12,
+    13
+  ],
+  "optional_beats": [
+    6,
+    9,
+    11
+  ]
+}

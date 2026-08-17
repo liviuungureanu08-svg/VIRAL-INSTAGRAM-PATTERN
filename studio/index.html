@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentary Studio</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b24; --panel2:#1c222d; --line:#2a323f;
+    --txt:#e6e9ef; --muted:#8b95a6; --accent:#c6f24e; --warn:#f2b34e; --bad:#f2604e; --good:#4ef2a0;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;
+         align-items:baseline;gap:14px;flex-wrap:wrap}
+  h1{font-size:17px;margin:0;letter-spacing:-.2px}
+  header .sub{color:var(--muted);font-size:13px}
+  nav{display:flex;gap:2px;padding:0 24px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  nav button{background:none;border:0;color:var(--muted);padding:11px 16px;cursor:pointer;
+             font-size:14px;border-bottom:2px solid transparent}
+  nav button:hover{color:var(--txt)}
+  nav button.on{color:var(--accent);border-bottom-color:var(--accent)}
+  main{padding:22px 24px;max-width:1180px}
+  section{display:none} section.on{display:block}
+  h2{font-size:14px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+     margin:0 0 10px;font-weight:600}
+  p.hint{color:var(--muted);font-size:13px;margin:0 0 14px}
+  textarea{width:100%;background:var(--panel);color:var(--txt);border:1px solid var(--line);
+           border-radius:8px;padding:12px;font-family:var(--mono);font-size:12.5px;
+           line-height:1.5;resize:vertical}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}
+  button.go{background:var(--accent);color:#10140a;border:0;border-radius:7px;
+            padding:9px 18px;font-weight:650;cursor:pointer;font-size:14px}
+  button.go:hover{filter:brightness(1.08)}
+  button.alt{background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+             border-radius:7px;padding:9px 14px;cursor:pointer;font-size:14px}
+  input[type=number]{background:var(--panel);color:var(--txt);border:1px solid var(--line);
+                     border-radius:6px;padding:8px 10px;width:88px;font-family:var(--mono)}
+  label{color:var(--muted);font-size:13px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+        padding:16px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+  .stat b{display:block;font-size:19px;font-family:var(--mono);letter-spacing:-.5px}
+  .stat span{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+  td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px;
+      overflow:auto;font-family:var(--mono);font-size:12.5px;line-height:1.6;max-height:620px;
+      white-space:pre-wrap;word-break:break-word}
+  .pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:650;
+        font-family:var(--mono)}
+  .pill.rec{background:#2a2035;color:#d9b6ff}
+  .pill.voi{background:#1f2b22;color:var(--good)}
+  .f{padding:8px 11px;border-radius:7px;margin:6px 0;font-size:13.5px;border-left:3px solid}
+  .f.block{background:#2a1614;border-color:var(--bad)}
+  .f.warn{background:#2a2314;border-color:var(--warn)}
+  .f code{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .verdict{padding:11px 14px;border-radius:8px;font-weight:650;margin:12px 0}
+  .verdict.ok{background:#152a1f;color:var(--good)}
+  .verdict.no{background:#2a1614;color:var(--bad)}
+  .gap{color:var(--warn)} .fine{color:var(--muted)}
+  .tabs2{display:flex;gap:2px;margin:14px 0 0}
+  .tabs2 button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+                padding:6px 13px;cursor:pointer;font-size:13px;border-radius:6px 6px 0 0}
+  .tabs2 button.on{color:var(--accent);background:var(--panel)}
+  .muted{color:var(--muted)}
+  .spin{opacity:.5;pointer-events:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Documentary Studio</h1>
+  <span class="sub">paste transcripts → measure structure → validate facts → assemble script</span>
+</header>
+
+<nav>
+  <button class="on" data-t="analyse">1 · Analyse</button>
+  <button data-t="slots">2 · Facts</button>
+  <button data-t="build">3 · Script</button>
+  <button data-t="about">Reference</button>
+</nav>
+
+<main>
+
+<!-- ============ ANALYSE ============ -->
+<section id="analyse" class="on">
+  <h2>Transcript structure</h2>
+  <p class="hint">Paste one transcript per box. Measurement is deterministic — regex and counting,
+     no model — so every number here can be checked by hand against the text.</p>
+  <div id="boxes"></div>
+  <div class="row">
+    <button class="alt" id="addBox">+ another transcript</button>
+    <button class="go" id="runAnalyse">Analyse</button>
+  </div>
+  <div id="analyseOut"></div>
+</section>
+
+<!-- ============ FACTS ============ -->
+<section id="slots">
+  <h2>Fact slots</h2>
+  <p class="hint">Every fact-bearing field needs a source. Missing sources block the render —
+     they are not warnings. Named decedents require Tier A; Tier D is barred outright.</p>
+  <div class="row">
+    <button class="alt" id="loadExample">Load worked example</button>
+    <button class="go" id="runValidate">Validate</button>
+  </div>
+  <textarea id="slotsBox" rows="22" spellcheck="false" placeholder='{ "episode": { ... }, "people": [ ... ] }'></textarea>
+  <div id="validateOut"></div>
+</section>
+
+<!-- ============ BUILD ============ -->
+<section id="build">
+  <h2>Assemble</h2>
+  <p class="hint">Record beats (2, 5, 7, 8, 10, 11) render from slots by formatting only.
+     Voice beats (1, 3, 4, 6, 9, 12, 13) come from the box below, or from Gemini when a key is set.</p>
+  <div class="row">
+    <label>Target minutes</label>
+    <input type="number" id="minutes" value="25" min="3" max="60" step="1">
+    <button class="go" id="runBuild">Build script</button>
+    <span class="muted" id="buildNote"></span>
+  </div>
+  <div id="buildOut"></div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about">
+  <h2>Beat plan</h2>
+  <div class="card"><div id="beatPlan"></div></div>
+  <h2>Corpus profile</h2>
+  <div class="card"><div id="corpus"></div></div>
+</section>
+
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const el = (t,c,h) => { const n=document.createElement(t); if(c)n.className=c; if(h!==undefined)n.innerHTML=h; return n; };
+const esc = s => String(s??'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+let voiceCache = {};
+
+// tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===b.dataset.t));
+});
+
+async function api(path, body){
+  const r = await fetch(path, body!==undefined
+    ? {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}
+    : {});
+  const j = await r.json();
+  if(j.error) throw new Error(j.error);
+  return j;
+}
+
+// ---------- transcript boxes ----------
+let boxN = 0;
+function addBox(){
+  boxN++;
+  const wrap = el('div','card');
+  wrap.innerHTML = `<h2 style="margin-bottom:8px">Transcript ${boxN}</h2>
+    <textarea rows="7" spellcheck="false" data-tx placeholder="Paste the full transcript…"></textarea>`;
+  $('#boxes').appendChild(wrap);
+}
+addBox();
+$('#addBox').onclick = addBox;
+
+function findingsHTML(findings){
+  if(!findings || !findings.length) return '';
+  return findings.map(f=>`<div class="f ${f.severity==='block'?'block':'warn'}">
+      <code>${esc(f.path)}</code> — ${esc(f.message)}</div>`).join('');
+}
+
+// ---------- analyse ----------
+$('#runAnalyse').onclick = async () => {
+  const out = $('#analyseOut'); out.innerHTML='<p class="muted">measuring…</p>';
+  const transcripts = {};
+  document.querySelectorAll('[data-tx]').forEach((t,i)=>{ if(t.value.trim()) transcripts['transcript_'+(i+1)]=t.value; });
+  if(!Object.keys(transcripts).length){ out.innerHTML='<p class="muted">Nothing pasted.</p>'; return; }
+  try{
+    const j = await api('/api/analyse',{transcripts});
+    out.innerHTML='';
+    for(const [name,a] of Object.entries(j.analyses)){
+      const c = el('div','card');
+      c.appendChild(el('h2',null,esc(name)));
+      const g = el('div','grid');
+      [['words',a.word_count],['est. minutes',a.estimated_runtime_minutes],
+       ['mean sentence',a.mean_sentence_words+'w'],['short (<6w)',Math.round(a.short_sentence_ratio*100)+'%'],
+       ['present tense',Math.round(a.present_tense_signal*100)+'%'],
+       ['archival clips',a.archival_inserts.length],['clock refs',a.clock_references.length],
+       ['named people',a.named_people.length]
+      ].forEach(([k,v])=>g.appendChild(el('div','stat',`<b>${esc(v)}</b><span>${esc(k)}</span>`)));
+      c.appendChild(g);
+
+      let rows = a.beats.map(b=>`<tr><td class="num">${b.beat}</td><td>${esc(b.name)}</td>
+        <td class="num">${Math.round(b.position*100)}%</td>
+        <td class="muted">${esc(String(b.evidence).slice(0,110))}</td></tr>`).join('');
+      c.appendChild(el('div',null,`<table><tr><th>#</th><th>Beat detected</th><th>at</th><th>evidence</th></tr>${rows}</table>`));
+      if(a.beats_missing.length)
+        c.appendChild(el('p','hint',`Not detected: beats ${a.beats_missing.join(', ')}`));
+      if(a.named_people.length)
+        c.appendChild(el('p','hint','Candidate people (unverified): '+
+          a.named_people.map(p=>esc(p.name)+(p.age?' ('+p.age+')':'')).join(' · ')));
+      out.appendChild(c);
+    }
+    const p = j.profile, pc = el('div','card');
+    pc.appendChild(el('h2',null,'Corpus profile'));
+    pc.appendChild(el('pre',null,esc(JSON.stringify(p,null,2))));
+    out.appendChild(pc);
+  }catch(e){ out.innerHTML=`<div class="verdict no">${esc(e.message)}</div>`; }
+};
+
+// ---------- facts ----------
+$('#loadExample').onclick = async () => {
+  try{
+    const j = await api('/api/example');
+    $('#slotsBox').value = JSON.stringify(j.slots,null,2);
+    voiceCache = j.voice || {};
+    $('#buildNote').textContent = 'voice beats loaded from example';
+  }catch(e){ alert(e.message); }
+};
+
+function readSlots(){
+  const raw = $('#slotsBox').value.trim();
+  if(!raw) throw new Error('No slot document.');
+  try{ return JSON.parse(raw); }
+  catch(e){ throw new Error('Slots are not valid JSON: '+e.message); }
+}
+
+$('#runValidate').onclick = async () => {
+  const out = $('#validateOut');
+  try{
+    const j = await api('/api/validate',{slots:readSlots()});
+    out.innerHTML = `<div class="verdict ${j.ok?'ok':'no'}">${j.ok?'✅ Render allowed':'❌ Render blocked'}</div>`
+      + findingsHTML(j.findings);
+  }catch(e){ out.innerHTML=`<div class="verdict no">${esc(e.message)}</div>`; }
+};
+
+// ---------- build ----------
+$('#runBuild').onclick = async () => {
+  const out = $('#buildOut'); out.innerHTML='<p class="muted">assembling…</p>';
+  try{
+    const j = await api('/api/build',{
+      slots:readSlots(), voice:voiceCache,
+      target_minutes:parseFloat($('#minutes').value)||25
+    });
+    if(!j.ok){
+      out.innerHTML = `<div class="verdict no">❌ Render blocked — fix the facts first</div>`
+        + findingsHTML(j.findings); return;
+    }
+    out.innerHTML='';
+    const g = el('div','grid');
+    const short = j.target_words - j.word_count;
+    [['words',j.word_count],['runtime',j.runtime_minutes+' min'],
+     ['target',j.target_words+'w'],['shortfall',short>0?short+'w':'—']
+    ].forEach(([k,v])=>g.appendChild(el('div','stat',`<b>${esc(v)}</b><span>${esc(k)}</span>`)));
+    out.appendChild(g);
+
+    const rows = j.beats.map(b=>{
+      const d=b.words-b.target, tol=Math.max(15,b.target*0.25);
+      return `<tr><td class="num">${b.beat}</td><td>${esc(b.name)}</td>
+        <td><span class="pill ${b.kind==='record'?'rec':'voi'}">${b.kind}</span></td>
+        <td class="num">${b.words}</td><td class="num muted">${b.target}</td>
+        <td class="num ${Math.abs(d)>tol?'gap':'fine'}">${d>0?'+':''}${d}</td></tr>`;}).join('');
+    out.appendChild(el('div','card',
+      `<h2>Beats</h2><table><tr><th>#</th><th>Beat</th><th>kind</th><th>words</th>
+       <th>target</th><th>drift</th></tr>${rows}</table>`));
+
+    if(j.findings && j.findings.length)
+      out.appendChild(el('div','card',`<h2>Warnings</h2>${findingsHTML(j.findings)}`));
+
+    const tabs = el('div','card');
+    tabs.innerHTML = `<div class="tabs2">
+        <button class="on" data-v="annotated">Annotated</button>
+        <button data-v="narration">Narration (TTS)</button>
+        <button data-v="sources">Sources</button>
+      </div><pre id="scriptPre"></pre>`;
+    out.appendChild(tabs);
+    const views = {annotated:j.annotated, narration:j.narration, sources:j.sources};
+    const show = k => $('#scriptPre').textContent = views[k];
+    tabs.querySelectorAll('.tabs2 button').forEach(b=>b.onclick=()=>{
+      tabs.querySelectorAll('.tabs2 button').forEach(x=>x.classList.toggle('on',x===b));
+      show(b.dataset.v);
+    });
+    show('annotated');
+  }catch(e){ out.innerHTML=`<div class="verdict no">${esc(e.message)}</div>`; }
+};
+
+// ---------- reference ----------
+(async()=>{
+  try{
+    const b = await api('/api/beats');
+    const rows = Object.entries(b.plan).map(([n,v])=>{
+      const kind = [1,3,4,6,9,12,13].includes(+n)?'voice':'record';
+      return `<tr><td class="num">${n}</td><td>${esc(v.name)}</td>
+        <td><span class="pill ${kind==='record'?'rec':'voi'}">${kind}</span></td>
+        <td class="num">${Math.round(v.share*1000)/10}%</td>
+        <td class="num muted">${Math.round(v.share*3750)}w</td></tr>`;}).join('');
+    $('#beatPlan').innerHTML = `<table><tr><th>#</th><th>Beat</th><th>kind</th>
+      <th>share</th><th>@25min</th></tr>${rows}</table>`;
+  }catch(e){ $('#beatPlan').textContent = e.message; }
+  try{
+    const c = await api('/api/corpus');
+    $('#corpus').innerHTML = Object.keys(c).length
+      ? `<pre>${esc(JSON.stringify(c,null,2))}</pre>`
+      : '<p class="muted">No corpus profile yet — analyse transcripts first.</p>';
+  }catch(e){ $('#corpus').textContent = e.message; }
+})();
+</script>
+</body>
+</html>
