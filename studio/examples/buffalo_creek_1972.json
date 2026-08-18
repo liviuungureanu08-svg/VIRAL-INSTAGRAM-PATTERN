@@ -1,6 +1,5 @@
 {
-  "_note": "Worked example. Facts researched from the sources cited in each slot. Voice beats hand-written to demonstrate the architecture without a Gemini key present. See EXAMPLE-REVIEW.md for what still needs verifying before this could be published.",
-
+  "_note": "Worked example, expanded pass. Facts gathered from the cited sources. NOTE: primary documents were egress-blocked from the build environment, so citations rest on secondary summaries and MUST be checked against the Governor's Ad Hoc Commission report before publication. See EXAMPLE-REVIEW.md.",
   "slots": {
     "episode": {
       "title_working": "The Flood That Wasn't a Flood",
@@ -10,14 +9,30 @@
       "trigger_event": "Failure of Pittston Coal's Dam 3 coal slurry impoundment",
       "thesis": {
         "assumed_cause": "Three days of heavy rain",
-        "actual_cause": "A non-engineered coal waste pile that had been inspected and called satisfactory four days earlier, while the company watched the water rise for 24 hours without warning anyone downstream",
-        "duration_of_failure": "years of unengineered tipping",
-        "who_knew": "Pittston Coal Company officials and a federal mine inspector",
+        "actual_cause": "A refuse pile built with almost no engineering, whose only plan was a sketch, and whose owner ordered the warnings stopped hours before it broke",
+        "duration_of_failure": "five years of documented warnings",
+        "who_knew": "Pittston, Buffalo Mining, the state, and the US Department of the Interior",
         "source": {
-          "body": "West Virginia Ad Hoc Commission of Inquiry (appointed by Gov. Arch A. Moore Jr.)",
-          "title": "Report on the Buffalo Creek flood — finding of 'flagrant disregard' for resident safety",
-          "date": "1972",
-          "locator": "e-WV: The West Virginia Encyclopedia, entry 664",
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        }
+      }
+    },
+    "foreknowledge": [
+      {
+        "document_name": "a warning to state officials that the Buffalo Creek impoundments were unstable and dangerous",
+        "date": "1967",
+        "commissioning_body": "the US Department of the Interior",
+        "prediction": "that these dams, and twenty-nine others across West Virginia, were unsafe",
+        "response": "The warning did not result in the impoundments being rebuilt",
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
@@ -26,38 +41,15 @@
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
           }
-        }
-      }
-    },
-
-    "foreknowledge": [
-      {
-        "document_name": "a federal mine inspector's assessment of Dam 3",
-        "date": "February 1972",
-        "commissioning_body": "the US Bureau of Mines",
-        "prediction": "nothing — the impoundment was declared satisfactory four days before it failed",
-        "response": "No remedial action was ordered",
-        "source": {
-          "body": "e-WV: The West Virginia Encyclopedia",
-          "title": "Buffalo Creek Flood",
-          "date": "n.d.",
-          "locator": "wvencyclopedia.org/entries/664",
-          "tier": "C",
-          "corroborated_by": {
-            "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
-            "date": "n.d.",
-            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
-            "tier": "A"
-          }
-        }
+        },
+        "narration": "In 1967, the United States Department of the Interior told officials in West Virginia that the impoundments on Buffalo Creek were unstable and dangerous. It was not a lone observation about one bad dam. The same warning covered twenty-nine other structures across the state. The dams were not rebuilt."
       },
       {
-        "document_name": "Pittston's own observations of the rising impoundment",
-        "date": "25 February 1972",
+        "document_name": "a partial collapse of one of the Buffalo Creek dams",
+        "date": "March 1967",
         "commissioning_body": "",
-        "prediction": "that the water behind Dam 3 was rising steadily and ominously",
-        "response": "A Pittston official in the area was alerted; the residents of the hollow were not",
+        "prediction": "nothing was predicted — the hollow simply flooded, five years early, as a demonstration",
+        "response": "State officials asked for a few minor alterations",
         "source": {
           "body": "e-WV: The West Virginia Encyclopedia",
           "title": "Buffalo Creek Flood",
@@ -66,21 +58,57 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
           }
-        }
+        },
+        "narration": "That same year, one of the Buffalo Creek dams partially gave way. The hollow flooded. Nobody was killed, and afterwards the state asked the company to make a few minor alterations. What had happened, in effect, was a demonstration. Five years early, on a small scale, the valley was shown exactly what these structures did when they failed. The lesson was recorded and filed."
+      },
+      {
+        "document_name": "the engineering file for Impoundment 3",
+        "date": "before 1972",
+        "commissioning_body": "Buffalo Mining Company",
+        "prediction": "that a structure holding back 132 million gallons above seventeen inhabited communities had never actually been designed by anybody",
+        "response": "There was no engineering file. All three impoundments were built with almost no engineering involvement, and the only plan for Impoundment 3 was a sketch drawn by the on-site vice president",
+        "source": {
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        },
+        "narration": "Then there is the question of who designed Impoundment 3, and the answer is that essentially nobody did. All three impoundments were built with almost no engineering involvement at all. There were no load calculations, no material specifications, no analysis of what three days of rain would do. The only plan that existed for Impoundment 3 — a structure holding back a hundred and thirty-two million gallons above seventeen inhabited communities — was a sketch, drawn by the vice president who ran the site."
+      },
+      {
+        "document_name": "a federal inspection of Dam 3",
+        "date": "February 1972",
+        "commissioning_body": "the US Bureau of Mines",
+        "prediction": "none — the impoundment was declared satisfactory",
+        "response": "Four days later it failed",
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
+          "tier": "C",
+          "corroborated_by": {
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+            "date": "n.d.",
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
+          }
+        },
+        "narration": "And four days before it broke, a federal inspector from the Bureau of Mines looked at Dam 3 and wrote down that it was satisfactory."
       }
     ],
-
     "timeline": [
       {
-        "timestamp_local": "1972-02-26T08:00",
-        "display_time": "approximately eight in the morning on February 26th",
-        "event": "Dam 3 fails on the Middle Fork of Buffalo Creek, releasing its impoundment into the hollow",
-        "measurement": { "value": "132 million", "unit": "gallons of water, coal refuse and silt" },
+        "timestamp_local": "1972-02-23",
+        "display_time": "the twenty-third of February",
+        "event": "rain begins falling across the Buffalo Creek watershed, and does not stop for three days",
         "source": {
           "body": "e-WV: The West Virginia Encyclopedia",
           "title": "Buffalo Creek Flood",
@@ -89,17 +117,107 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
           }
-        }
+        },
+        "narration": "It starts with rain. On the twenty-third of February, rain begins falling across the watershed above Buffalo Creek, and it does not stop. It keeps falling through the twenty-fourth. It is still falling on the twenty-fifth."
+      },
+      {
+        "timestamp_local": "1972-02-25T12:00",
+        "display_time": "the twenty-fifth",
+        "event": "the water behind Dam 3 is climbing one to two inches every hour",
+        "source": {
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        },
+        "narration": "By the twenty-fifth, the water behind Dam 3 is no longer just high. It is climbing. One to two inches, every hour. That is a number somebody has to be standing there measuring, which means that by the twenty-fifth somebody is standing there measuring it."
+      },
+      {
+        "timestamp_local": "1972-02-25T18:00",
+        "display_time": "that evening",
+        "event": "a Buffalo Mining Company vice president is alerted that the impoundment is filling, and so are police in the valley below",
+        "source": {
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        },
+        "narration": "That evening, a vice president of the Buffalo Mining Company is told the impoundment is filling. The police in the valley below are told as well. At this point the disaster is still entirely preventable. There are hours left, a road out, and enough daylight to use it."
+      },
+      {
+        "timestamp_local": "1972-02-25T22:00",
+        "display_time": "through the night",
+        "event": "word travels down the hollow that the water has almost reached the top of the dam, and families sit up in their houses, awake, waiting",
+        "source": {
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        },
+        "narration": "Word travels down the hollow anyway, the way it does in a place where everyone works for the same company. The water is nearly at the top of the dam. Families sit up through the night in their houses, dressed, listening to rain on the roof, waiting to be told something."
+      },
+      {
+        "timestamp_local": "1972-02-26T01:30",
+        "display_time": "half past one in the morning",
+        "event": "the water behind Dam 3 stands exactly one foot below the crest",
+        "source": {
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        },
+        "narration": "At half past one in the morning, the water behind Dam 3 stands exactly one foot below the crest."
+      },
+      {
+        "timestamp_local": "1972-02-26T03:00",
+        "display_time": "the hours that follow",
+        "event": "the vice president orders every effort to warn residents stopped, and tells the police that the dam will hold",
+        "source": {
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        },
+        "narration": "And in the hours that follow, the vice president orders every effort to warn residents stopped. He tells the police the dam will hold. The people sitting up in their houses are not told to leave. The last piece of useful information anyone had was withdrawn while they waited for it."
+      },
+      {
+        "timestamp_local": "1972-02-26T08:00",
+        "display_time": "approximately eight in the morning",
+        "event": "Dam 3 gives way",
+        "measurement": {
+          "value": "132 million",
+          "unit": "gallons of water, coal refuse and silt"
+        },
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
+          "tier": "C",
+          "corroborated_by": {
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+            "date": "n.d.",
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
+          }
+        },
+        "narration": "At approximately eight in the morning, Dam 3 gives way. A hundred and thirty-two million gallons of water, coal refuse and silt come out of the head of the hollow at once."
       },
       {
         "timestamp_local": "1972-02-26T08:02",
         "display_time": "roughly two minutes later",
-        "event": "the black wave reaches two further coal waste dams downstream and plows through them",
+        "event": "the black wave reaches the two impoundments below it and plows straight through both",
         "source": {
           "body": "e-WV: The West Virginia Encyclopedia",
           "title": "Buffalo Creek Flood",
@@ -108,17 +226,78 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
           }
-        }
+        },
+        "narration": "Two minutes later it reaches the two impoundments below. Neither slows it. It plows straight through both of them and takes their contents with it, so the wave that continues down the valley is larger than the one that started."
+      },
+      {
+        "timestamp_local": "1972-02-26T08:05",
+        "display_time": "within minutes",
+        "event": "Saunders, the community nearest the dams, is struck first, and ceases to exist",
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
+          "tier": "C",
+          "corroborated_by": {
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+            "date": "n.d.",
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
+          }
+        },
+        "narration": "Saunders is nearest, and Saunders goes first. Not damaged. Not flooded. The community is removed from the ground it stood on."
+      },
+      {
+        "timestamp_local": "1972-02-26T08:15",
+        "display_time": "the wave moves on",
+        "event": "Pardee, Lorado, Craneco and Lundale are hit in sequence as the water runs the length of the hollow",
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
+          "tier": "C",
+          "corroborated_by": {
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+            "date": "n.d.",
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
+          }
+        },
+        "narration": "Then it runs. Pardee. Lorado. Craneco. Lundale. The wave moves down the single road that every one of these places was built along, and there is no sideways to go, because a hollow has walls."
+      },
+      {
+        "timestamp_local": "1972-02-26T09:00",
+        "display_time": "the hour after",
+        "event": "Stowe, Crites, Latrobe, Robinette and Amherstdale follow",
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
+          "tier": "C",
+          "corroborated_by": {
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+            "date": "n.d.",
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
+          }
+        },
+        "narration": "Stowe. Crites. Latrobe. Robinette. Amherstdale. By now people downstream can hear it before they can see it — a sound that survivors describe as unlike anything else, arriving several seconds ahead of the water."
       },
       {
         "timestamp_local": "1972-02-26T11:00",
-        "display_time": "the three hours that follow",
-        "event": "the water demolishes or partially destroys seventeen communities down the hollow — Saunders, Pardee, Lorado, Craneco, Lundale, Stowe, Crites, Latrobe, Robinette, Amherstdale, Becco, Fanco, Riley, Braeholm, Accoville, Crown and Kistler",
+        "display_time": "three hours from the first breach",
+        "event": "seventeen communities have been demolished or partly destroyed, ending at Kistler where the hollow opens out",
         "source": {
           "body": "e-WV: The West Virginia Encyclopedia",
           "title": "Buffalo Creek Flood",
@@ -127,23 +306,36 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
           }
-        }
+        },
+        "narration": "Three hours from the first breach, it is over. Seventeen communities have been demolished or partly destroyed along sixteen miles of valley, ending at Kistler where the hollow finally opens out and the water spreads and loses its strength."
+      },
+      {
+        "timestamp_local": "1972-02-26T18:00",
+        "display_time": "by the end of the day",
+        "event": "more than five hundred homes are gone and over four thousand people have nowhere to sleep",
+        "source": {
+          "body": "Association of State Dam Safety Officials",
+          "title": "Buffalo Creek Dam Failure of 1972 — Policy Outcomes",
+          "date": "n.d.",
+          "locator": "damsafety.org/reference/buffalo-creek-dam-failure-1972-policy-outcomes-failure",
+          "tier": "A"
+        },
+        "narration": "By the end of that day more than five hundred homes are gone, and over four thousand people have nowhere to sleep."
       }
     ],
-
     "people": [
       {
         "full_name": "Shirley Marcum",
         "age": null,
         "role": "a resident of the hollow",
-        "decedent": false,
+        "role_type": "survivor",
         "spoke_publicly_on_record": true,
-        "humanising_detail": "She survived, and what she remembers is not the water but the warning — a neighbour who stopped her car in the road and shouted",
+        "humanising_detail": "She survived, and what she remembers is not the water. It is the warning system the hollow actually had: a neighbour who stopped her car in the road and shouted",
         "final_words": "The only warning we had was just a neighbor woman had spotted it and just pulled in front of our house and hollered, 'Run, the dam has broke!'",
         "final_words_verbatim": true,
         "final_words_source": {
@@ -153,14 +345,14 @@
           "locator": "daily.jstor.org/the-tragedy-at-buffalo-creek/",
           "tier": "C",
           "corroborated_by": {
-            "body": "e-WV: The West Virginia Encyclopedia",
-            "title": "Buffalo Creek Flood",
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
-            "locator": "wvencyclopedia.org/entries/664",
-            "tier": "B"
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
           }
         },
-        "outcome_line": "That was the alarm system.",
+        "outcome_line": "That was it. That was the alarm.",
         "source": {
           "body": "JSTOR Daily",
           "title": "The Tragedy at Buffalo Creek",
@@ -168,17 +360,35 @@
           "locator": "daily.jstor.org/the-tragedy-at-buffalo-creek/",
           "tier": "C",
           "corroborated_by": {
-            "body": "e-WV: The West Virginia Encyclopedia",
-            "title": "Buffalo Creek Flood",
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
-            "locator": "wvencyclopedia.org/entries/664",
-            "tier": "B"
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
           }
         },
-        "family_sensitivity_reviewed": false
+        "family_sensitivity_reviewed": false,
+        "narration": "Shirley Marcum lived in the hollow, and she survived. What she remembers afterwards is not the water. It is the warning system that Buffalo Creek actually had that morning — which was not a siren, not a telephone tree, not the company, and not the police. In her account, a neighbour spotted it, pulled her car up in front of the house, and shouted. Her words: \"The only warning we had was just a neighbor woman had spotted it and just pulled in front of our house and hollered, 'Run, the dam has broke!'\" That was the alarm. A woman in a car, shouting. Everything upstream — the measurements, the vice president, the police who had been told the night before — produced nothing that reached these houses. The warning that saved lives in the hollow was one neighbour deciding, on her own, to stop and shout."
+      },
+      {
+        "full_name": "Steve Dasovich",
+        "age": null,
+        "role": "the on-site vice president of the Buffalo Mining Company",
+        "role_type": "official",
+        "official_capacity": "on-site vice president named in the engineering record for Impoundment 3",
+        "humanising_detail": "He is named in the engineering record for a document he produced. Impoundment 3 held back 132 million gallons above seventeen inhabited communities, and the only plan for it was a sketch he had drawn",
+        "outcome_line": "A sketch. That was the design.",
+        "source": {
+          "body": "ASDSO",
+          "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+          "date": "n.d.",
+          "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+          "tier": "A"
+        },
+        "family_sensitivity_reviewed": false,
+        "narration": "The engineering record for Impoundment 3 names one man: Steve Dasovich, the vice president on site. He is named because of a document he produced. Not a design review, not a stability analysis, not a specification for the material the structure was made of. A sketch. That was the plan for a wall of coal waste holding back a hundred and thirty-two million gallons of water above seventeen towns full of sleeping people. It is worth sitting with how ordinary that was. Nobody hid it. There was no cover-up at the design stage, because there was no design stage. The company built the thing the way you build a rubbish heap, and the state of West Virginia looked at it and let it stand."
       }
     ],
-
     "aftermath": {
       "death_toll": {
         "value": 125,
@@ -190,7 +400,7 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
@@ -207,7 +417,7 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
@@ -224,21 +434,25 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
           }
         }
-      }
-    },
-
-    "reckoning": [
-      {
-        "change": "held eight public hearings, questioned 91 witnesses, compiled nine volumes of testimony and concluded that Pittston had shown flagrant disregard for the safety of Buffalo Creek residents",
-        "date": "1972",
-        "body": "the Ad Hoc Commission of Inquiry appointed by Governor Arch A. Moore Jr.",
-        "adequacy_note": "",
+      },
+      "structures_destroyed": {
+        "value": 500,
+        "source": {
+          "body": "Association of State Dam Safety Officials",
+          "title": "Buffalo Creek Dam Failure of 1972 — Policy Outcomes",
+          "date": "n.d.",
+          "locator": "damsafety.org/reference/buffalo-creek-dam-failure-1972-policy-outcomes-failure",
+          "tier": "A"
+        }
+      },
+      "communities_destroyed": {
+        "value": 17,
         "source": {
           "body": "e-WV: The West Virginia Encyclopedia",
           "title": "Buffalo Creek Flood",
@@ -247,18 +461,62 @@
           "tier": "C",
           "corroborated_by": {
             "body": "ASDSO",
-            "title": "Buffalo Creek Dam case study",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
             "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
             "tier": "A"
           }
         }
       },
+      "narration": "A hundred and twenty-five people were killed. One thousand one hundred and twenty-one were injured. Over four thousand were left homeless — in a valley whose entire population was around five thousand. More than five hundred homes were destroyed. Seventeen communities were demolished or partly destroyed along sixteen miles of hollow. Those numbers describe a place that did not simply lose buildings. Buffalo Creek lost the thing that made it a set of communities rather than a set of addresses, and the sociologist who studied it afterwards found survivors describing their own valley as dead — not because the ground was gone, but because everyone who had made it a place was scattered across temporary housing and never came back together."
+    },
+    "reckoning": [
       {
-        "change": "645 survivors and family members sued Pittston; the case settled for 13.5 million dollars, which after legal fees came to roughly 13,000 dollars per plaintiff",
+        "change": "held eight public hearings, questioned ninety-one witnesses, compiled nine volumes of testimony, and concluded that Pittston had shown flagrant disregard for the safety of the people living below its impoundments",
+        "date": "1972",
+        "body": "the Ad Hoc Commission of Inquiry appointed by Governor Arch A. Moore Jr.",
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
+          "tier": "C",
+          "corroborated_by": {
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+            "date": "n.d.",
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
+          }
+        },
+        "narration": "Governor Arch A. Moore Jr. appointed an Ad Hoc Commission of Inquiry. It held eight public hearings, questioned ninety-one witnesses, and compiled nine volumes of testimony. Its conclusion was that Pittston had shown flagrant disregard for the safety of the people living below its impoundments."
+      },
+      {
+        "change": "went further, and charged in its report that officials of the Buffalo Mining and Pittston companies were guilty of murdering at least a hundred and twenty-four men, women and children living in the hollow",
+        "date": "1972",
+        "body": "a separate citizens' commission",
+        "adequacy_note": "Pittston's president denied that the company was guilty of criminal negligence. No one went to prison",
+        "source": {
+          "body": "e-WV: The West Virginia Encyclopedia",
+          "title": "Buffalo Creek Flood",
+          "date": "n.d.",
+          "locator": "wvencyclopedia.org/entries/664",
+          "tier": "C",
+          "corroborated_by": {
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
+            "date": "n.d.",
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
+          }
+        },
+        "narration": "A separate citizens' commission went considerably further. Its report charged that officials of the Buffalo Mining and Pittston companies were guilty of murdering at least a hundred and twenty-four men, women and children in the hollow. Pittston's president denied that the company was guilty of criminal negligence. Nobody went to prison. Nobody was charged."
+      },
+      {
+        "change": "six hundred and forty-five survivors and family members sued Pittston. The case settled for thirteen and a half million dollars, which after legal fees came to roughly thirteen thousand dollars a person",
         "date": "1974",
         "body": "",
-        "adequacy_note": "One hundred and twenty-five people died. The settlement worked out to about thirteen thousand dollars each",
+        "adequacy_note": "A hundred and twenty-five people died. The settlement worked out to about thirteen thousand dollars each",
         "source": {
           "body": "JSTOR Daily",
           "title": "The Tragedy at Buffalo Creek",
@@ -266,16 +524,29 @@
           "locator": "daily.jstor.org/the-tragedy-at-buffalo-creek/",
           "tier": "C",
           "corroborated_by": {
-            "body": "e-WV: The West Virginia Encyclopedia",
-            "title": "Buffalo Creek Flood",
+            "body": "ASDSO",
+            "title": "Buffalo Creek Dam (West Virginia, 1972) — Dam Failures and Lessons Learned",
             "date": "n.d.",
-            "locator": "wvencyclopedia.org/entries/664",
-            "tier": "B"
+            "locator": "damfailures.org/case-study/buffalo-creek-dam-west-virginia-1972",
+            "tier": "A"
           }
-        }
+        },
+        "narration": "Six hundred and forty-five survivors and family members sued. In 1974 the case settled for thirteen and a half million dollars. After legal fees, that came to roughly thirteen thousand dollars a person. A hundred and twenty-five people were dead, and the price arrived at was about thirteen thousand dollars each."
+      },
+      {
+        "change": "Congress passed the National Dam Inspection Act, requiring an inventory and inspection of dams across the United States",
+        "date": "six months after the failure, in 1972",
+        "body": "",
+        "source": {
+          "body": "Association of State Dam Safety Officials",
+          "title": "Buffalo Creek Dam Failure of 1972 — Policy Outcomes",
+          "date": "n.d.",
+          "locator": "damsafety.org/reference/buffalo-creek-dam-failure-1972-policy-outcomes-failure",
+          "tier": "A"
+        },
+        "narration": "Six months after the failure, Congress passed the National Dam Inspection Act, requiring an inventory and inspection of dams across the United States. It took a hundred and twenty-five deaths in one West Virginia valley to produce a law that counted how many other structures like it existed. The answer, once anyone finally counted, was thousands."
       }
     ],
-
     "archival_audio": [
       {
         "description": "PLACEHOLDER — a clip must be located and cleared before render",
@@ -285,20 +556,13 @@
       }
     ]
   },
-
   "voice": {
-    "1": "February 26th, 1972. Just before eight in the morning in Logan County, West Virginia. Rain has been falling on the mountains above Buffalo Creek for three days, and behind a pile of coal waste at the head of the hollow, 132 million gallons of black water are sitting where nobody engineered them to sit.",
-
-    "3": "132 million gallons. Seventeen communities. Three hours.",
-
-    "4": "But the rain wasn't the threat. What came down that hollow was not a flood. It was a waste pile — built without a plan, held back by nothing anyone had designed, and declared satisfactory by a federal inspector four days earlier. The company had been watching the water rise for a full day. The people living underneath it were never told. That gap, between what was known upstream and what was said downstream, is the entire story.",
-
-    "6": "To understand what happens at Buffalo Creek, you first have to understand what a slurry impoundment is, and why one was sitting above a valley full of houses. Coal comes out of a mountain mixed with rock and dirt, and before it can be sold it has to be washed. Washing produces two things: clean coal, and an enormous volume of black slurry — water, silt, and crushed refuse. That waste has to go somewhere. In the West Virginia coalfields, the somewhere was usually the nearest hollow. Companies dumped refuse across a stream until the pile itself became a dam, and the water backed up behind it. These were not dams in any engineering sense. Nobody calculated the load. Nobody specified the material. The structure was a byproduct of disposal that happened to hold water, and it held it above whatever was downstream. Buffalo Creek is a narrow valley with a single road running its length and a string of coal towns along it, one after another, each one built where the flat ground was. There is no high ground to reach and nowhere for water to spread. A hollow does not flood outward. It funnels. Anything released at the top arrives at the bottom concentrated rather than dispersed, and it arrives fast. Pittston Coal had three refuse dams stacked in the Middle Fork. Dam 3 was the newest and the highest, and it was the one holding the water.",
-
-    "9": "And the rain kept coming.\nWhat nobody in the hollow knew was that the decision had already been made — by not being made.\nUpstream, someone was already watching the water and doing the arithmetic.\nIt held until it didn't.",
-
-    "12": "The rain didn't destroy Buffalo Creek. It just found out what Pittston had built above it.",
-
-    "13": "If you made it this far, thank you for being here. These take a long time to research and put together, and every like, comment, and subscription genuinely helps keep them coming. If you want more stories like this one, consider subscribing. And to everyone already here, whether you found the channel today or a long time ago — thank you. You're the reason these get made. Stay safe, and I'll see you in the next one."
+    "1": "February 26th, 1972. Just before eight in the morning in Logan County, West Virginia. It has been raining on the mountains above Buffalo Creek for three days, and at the head of the hollow, behind a pile of coal waste, 132 million gallons of black water are sitting one foot below the top of something nobody ever engineered. Below it, along sixteen miles of single road, five thousand people are asleep. Some of them are not. Some of them have been awake all night.",
+    "3": "One hundred and thirty-two million gallons. Seventeen communities. Three hours from the first breach to the last.",
+    "4": "But the rain was not the threat. What came down that hollow was not a flood, and calling it one has always been the most useful lie in this story. It was a refuse pile. Built without a plan, held up by nothing anyone had calculated, and inspected four days earlier by a man who wrote down that it was satisfactory. The water had been rising for two days and the company knew. The police knew. And in the last hours before it broke, a company vice president told them to stop warning people, because the dam would hold.",
+    "6": "To understand what happens at Buffalo Creek, you first have to understand what was actually sitting above those houses, because it was not a reservoir and it was not a dam. Coal does not come out of a mountain clean. It comes out mixed with rock and clay and dirt, and before anyone will buy it, it has to be washed. Washing it produces two things. It produces coal, and it produces an enormous volume of black slurry — water, silt, and crushed rock with no value to anybody. That waste has to be put somewhere, and in the West Virginia coalfields the somewhere was almost always the nearest hollow. A company would tip its refuse across a stream, day after day, year after year, until the pile itself was tall enough to hold water back. And then the water would collect behind it. That is the entire design. Nobody calculated the load. Nobody specified the material. Nobody asked what would happen when three days of rain arrived at once. The structure was a byproduct of throwing rubbish away, which happened to be holding back a lake, above people's houses. Now understand the shape of the ground. Buffalo Creek is a hollow — a narrow valley with steep sides, one road running its length, and a string of coal towns strung along that road wherever the ground was flat enough to build. Saunders sat nearest the top. Then Pardee, Lorado, Craneco, Lundale, Stowe, Crites, Latrobe, Robinette, Amherstdale, Becco, Fanco, Riley, Braeholm, Accoville, Crown, and at the bottom, Kistler. Sixteen miles of them. There is no high ground in a hollow. There is nowhere to go sideways. And water released at the top does not spread out and lose its strength the way it would across open country. It is funnelled. It arrives at the bottom concentrated instead of dispersed, and it arrives fast. Pittston had three refuse dams stacked in the Middle Fork above all of it. Dam 3 was the newest, the highest, and the one holding the water.",
+    "9": "And the rain kept coming.\nBy then the decision had already been made — by nobody making one.\nUpstream, a man was watching the water climb and doing the arithmetic in his head.\nThe people in the houses below had been given the only piece of information that mattered, and then it had been taken back.\nIt held until it didn't.",
+    "12": "The rain didn't destroy Buffalo Creek. It only found out what Pittston had built above it, and what the state had agreed not to look at.",
+    "13": "If you made it this far, thank you for being here. These take a long time to research and put together, and every like, every comment, and every subscription genuinely helps keep them coming. If you want more stories like this one, consider subscribing — it makes a real difference to whether these get made at all. And to everyone already here, whether you found the channel today or have been watching for years, thank you. You are the reason these stories get told. Stay safe, and I'll see you in the next one."
   }
 }

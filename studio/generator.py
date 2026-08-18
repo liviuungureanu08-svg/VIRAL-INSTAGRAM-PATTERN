@@ -115,6 +115,19 @@ def _budget(total_words: int) -> dict[int, int]:
 # Record beats — rendered from slots by formatting only
 # --------------------------------------------------------------------------
 
+def _narration_of(item: dict) -> str | None:
+    """Return authored prose for a slot entry, if the researcher wrote any.
+
+    Formatting a fact into a sentence mechanically produces "125 death toll." —
+    accurate and unreadable. A slot may therefore carry a `narration` string
+    written alongside its source. This is not a model-generated field: it is
+    authored during research, travels with its citation, and is validated by the
+    same source rules as the value it describes.
+    """
+    text = str(item.get("narration") or "").strip()
+    return text or None
+
+
 def _render_archival(slots: dict) -> tuple[str, list[str]]:
     lines, sources = [], []
     for clip in slots.get("archival_audio", [])[:2]:
@@ -128,6 +141,11 @@ def _render_archival(slots: dict) -> tuple[str, list[str]]:
 def _render_foreknowledge(slots: dict) -> tuple[str, list[str]]:
     parts, sources = [], []
     for item in slots.get("foreknowledge", []):
+        if prose := _narration_of(item):
+            parts.append(prose)
+            sources.append(_fmt_source(item.get("source")))
+            continue
+
         sentence = []
         date = str(item.get("date", "")).strip()
         name = str(item.get("document_name", "")).strip()
@@ -153,6 +171,11 @@ def _render_foreknowledge(slots: dict) -> tuple[str, list[str]]:
 def _render_timeline(slots: dict) -> tuple[str, list[str]]:
     parts, sources = [], []
     for item in slots.get("timeline", []):
+        if prose := _narration_of(item):
+            parts.append(prose)
+            sources.append(_fmt_source(item.get("source")))
+            continue
+
         stamp = str(item.get("timestamp_local", "")).strip()
         event = str(item.get("event", "")).strip()
         display = str(item.get("display_time", "")).strip() or stamp
@@ -168,6 +191,13 @@ def _render_timeline(slots: dict) -> tuple[str, list[str]]:
 def _render_people(slots: dict) -> tuple[str, list[str]]:
     parts, sources = [], []
     for person in slots.get("people", []):
+        if prose := _narration_of(person):
+            parts.append(prose)
+            sources.append(_fmt_source(person.get("source")))
+            if person.get("final_words_source"):
+                sources.append(_fmt_source(person["final_words_source"]))
+            continue
+
         name = str(person.get("full_name", "")).strip()
         age = person.get("age")
         role = str(person.get("role", "")).strip()
@@ -205,8 +235,14 @@ def _render_aftermath(slots: dict) -> tuple[str, list[str]]:
         "area_affected": "{v} affected",
         "population_change": "Population falls from {before} to {after}",
     }
+    aftermath = slots.get("aftermath") or {}
+    if prose := _narration_of(aftermath):
+        srcs = [_fmt_source(v.get("source")) for v in aftermath.values()
+                if isinstance(v, dict) and v.get("source")]
+        return prose, srcs
+
     parts, sources = [], []
-    for key, value in (slots.get("aftermath") or {}).items():
+    for key, value in aftermath.items():
         if not isinstance(value, dict):
             continue
         template = LABELS.get(key, key.replace("_", " ").capitalize() + ": {v}")
@@ -233,6 +269,11 @@ def _render_aftermath(slots: dict) -> tuple[str, list[str]]:
 def _render_reckoning(slots: dict) -> tuple[str, list[str]]:
     parts, sources = [], []
     for item in slots.get("reckoning", []):
+        if prose := _narration_of(item):
+            parts.append(prose)
+            sources.append(_fmt_source(item.get("source")))
+            continue
+
         change = str(item.get("change", "")).strip()
         date = str(item.get("date", "")).strip()
         body = str(item.get("body", "")).strip()

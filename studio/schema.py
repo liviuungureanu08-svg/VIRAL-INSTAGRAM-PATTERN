@@ -159,15 +159,37 @@ def _validate_people(result: ValidationResult, people: list) -> None:
         else:
             _check_editorialising(result, f"{path}.outcome_line", person["outcome_line"])
 
-        # Decedents and survivors carry different evidentiary burdens. A death
-        # attributed to a named person must be Tier A. A survivor who has spoken
-        # publicly on the record is quoting themselves, and holding that to
-        # agency-report grade would bar legitimate first-hand testimony.
-        is_decedent = bool(person.get("decedent", True))
-        if is_decedent:
+        # Three categories, three evidentiary burdens.
+        #
+        #   decedent — a death attributed to a named person. Tier A only.
+        #   survivor — a private individual. Any allowed tier, but they must have
+        #              spoken publicly on the record; otherwise use their role.
+        #   official — a person named in an official inquiry or agency record in
+        #              their professional capacity. Naming them is ordinary
+        #              journalism, but the official record itself must be the
+        #              source, so Tier A.
+        #
+        # The third category emerged from real use: an executive named in a state
+        # commission's findings is neither a decedent nor a private survivor, and
+        # requiring them to have "spoken publicly" would have barred a fact that
+        # a government report states outright.
+        role_type = str(person.get("role_type", "")).strip().lower()
+        if not role_type:
+            role_type = "decedent" if person.get("decedent", True) else "survivor"
+
+        if role_type not in {"decedent", "survivor", "official"}:
+            result.block(f"{path}.role_type",
+                         f"{role_type!r} invalid; expected decedent, survivor or official")
+        elif role_type == "decedent":
             _check_source(result, f"{path}.source", person.get("source"),
                           TIER_FOR_NAMED_DECEDENT)
-        else:
+        elif role_type == "official":
+            _check_source(result, f"{path}.source", person.get("source"),
+                          TIER_FOR_NAMED_DECEDENT)
+            if not str(person.get("official_capacity", "")).strip():
+                result.block(f"{path}.official_capacity",
+                             "required — state the role the official record names them in")
+        else:  # survivor
             _check_source(result, f"{path}.source", person.get("source"))
             if not person.get("spoke_publicly_on_record", False):
                 result.block(
@@ -175,6 +197,8 @@ def _validate_people(result: ValidationResult, people: list) -> None:
                     "a living person may only be named if they have spoken publicly "
                     "on the record; otherwise use their role",
                 )
+
+        is_decedent = role_type == "decedent"
 
         if person.get("final_words"):
             if not is_decedent:
@@ -261,6 +285,11 @@ def validate(doc: dict) -> ValidationResult:
         result.block("aftermath", "required — beat 10 needs figures")
     else:
         for key, value in aftermath.items():
+            # `narration` is authored prose covering the whole block, not a
+            # figure, so it carries no value/source pair of its own — the
+            # figures it describes are each validated below.
+            if key == "narration":
+                continue
             if not isinstance(value, dict):
                 result.block(f"aftermath.{key}", "must be an object with value and source")
                 continue

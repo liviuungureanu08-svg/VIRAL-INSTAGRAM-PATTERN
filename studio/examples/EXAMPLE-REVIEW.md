@@ -1,100 +1,103 @@
 # Worked example — review notes
 
-**Topic:** The Buffalo Creek flood, Logan County, West Virginia, 26 February 1972.
+**Topic:** Buffalo Creek, Logan County, West Virginia, 26 February 1972.
+**Output:** `out/buffalo_creek_1972.mp4` — 12m28s, 1920×1080, h264 + AAC.
 
 Chosen because it is the closest structural analogue to your reference corpus: a
-"flood" that dissolves on inspection into documented corporate negligence. It
-clears all four ideation gates — there is a thesis, the event is 54 years old,
-official inquiry material exists, and named individuals are on the record.
+"flood" that dissolves on inspection into documented negligence. It clears all
+four ideation gates — a thesis exists, the event is 54 years old, official
+inquiry material exists, and named individuals are on the record.
 
 ---
 
-## ⚠️ This example is NOT publishable. Read this section first.
+## ⚠️ Not publishable as-is. Two reasons.
 
-Two gates were **simulated** to produce a readable script. In real use they are
-your actions, not mine:
+**1. Two gates are simulated.** In real use these are your actions:
 
-| Gate | State | What you must actually do |
+| Gate | State | What you must do |
 |---|---|---|
-| `people[0].family_sensitivity_reviewed` | **simulated true** | Genuinely review the entry. Shirley Marcum is a living person. |
-| `archival_audio[0]` | **simulated** | Locate a real clip and establish a rights basis. The slot file has it as an explicit `PLACEHOLDER` with `source: null`. |
+| `people[*].family_sensitivity_reviewed` | simulated | Genuinely review both entries |
+| `archival_audio[0]` | simulated | Locate a real clip and establish rights |
 
-Run the validator on the unmodified file and it **blocks**:
+Run the validator unmodified and it blocks with 4 findings. That block is the
+system working.
 
-```
-✗ people[0].family_sensitivity_reviewed: a human must review this entry before render
-✗ archival_audio[0].rights_basis: required before this clip may be used
-✗ archival_audio[0].source: missing source — unsourced claims cannot render
-❌ RENDER BLOCKED (3 blocking)
-```
+**2. Sources are secondary.** Every primary document — the Governor's Ad Hoc
+Commission report, the Bureau of Mines inspection record — was **egress-blocked
+from the build environment**. Citations therefore rest on search summaries and
+encyclopedia entries, mostly Tier C corroborated by an ASDSO case study.
 
-That block is the system working. It is the thing I most want you to examine.
-
----
-
-## The number that matters: 845 words, not 3,750
-
-The script assembled to **845 words ≈ 5.6 minutes** against a 25-minute target.
-The shortfall is not a bug — it is an accurate measurement of how much research
-is missing, and it points at exactly where:
-
-| Beat | Produced | Target | Gap | Why |
-|---|---|---|---|---|
-| 7 Timestamped escalation | 89w | 1050w | **−961** | 3 timeline entries; needs ~25–30 |
-| 8 Named people | 66w | 750w | **−684** | 1 person; needs 3–4 |
-| 10 Aftermath numbers | 12w | 300w | −288 | 3 figures; needs damage, structures, population |
-| 11 Institutional reckoning | 85w | 349w | −264 | needs the legislative aftermath |
-| 5 Foreknowledge | 75w | 300w | −225 | needs the inspection record in detail |
-| 6 Background | 240w | 476w | −236 | expand the slurry-impoundment explanation |
-
-**Voice beats came in close to target** (thesis −23, epigram −14). The deficit is
-entirely in the record beats. That is the honest shape of this problem: prose is
-cheap, sourced fact is expensive.
-
-To reach 25 minutes you need roughly **25 more timeline entries and 3 more named
-people**, each with a citation. That is an afternoon in an archive, not a prompt.
+**Before publishing, every figure must be checked against the primary record.**
+My source grading is a research starting point, not verification.
 
 ---
 
-## What is genuinely sourced here
+## Growth across three passes
 
-Every figure traces to a cited source in the slot file:
+| Pass | Words | Runtime | What changed |
+|---|---|---|---|
+| 1 | 845 | 5m34s | Initial research |
+| 2 | 1,492 | 9m54s | Deeper research: 13 timeline entries, 4 foreknowledge, 2 people |
+| 3 | **2,020** | **12m28s** | Authored narration attached to each sourced fact |
 
-- 132 million gallons; ~08:00, 26 Feb 1972; Middle Fork of Buffalo Creek
-- Two further waste dams breached within ~2 minutes
-- 17 communities destroyed over ~3 hours (all named)
-- 125 dead · 1,121 injured · 4,000+ homeless
-- Dam 3 declared *satisfactory* by a federal inspector **four days earlier**
-- Pittston knew the water was rising ~24 hours ahead; residents were not told
-- Ad Hoc Commission of Inquiry: 8 hearings, 91 witnesses, 9 volumes, finding of
-  *"flagrant disregard"*
-- 645 plaintiffs; settled 1974 for $13.5M ≈ $13,000 each after fees
-- Shirley Marcum's warning, quoted verbatim
+Against a 25-minute target the shortfall is 1,730 words, and the tool names
+exactly where:
 
-**Source-tier caveat you should not skip:** most slots are Tier C corroborated by
-an ASDSO case study marked Tier A. Before publishing, replace the Tier C entries
-with the primary documents — the Commission report itself, and the Bureau of
-Mines inspection record. My grading is a research starting point, not a
-verification.
+| Beat | Words | Target | Gap |
+|---|---|---|---|
+| 7 Timestamped escalation | 473 | 1050 | **−577** |
+| 8 Named people | 271 | 750 | **−479** |
+| 10 Aftermath | 121 | 300 | −179 |
+| 11 Reckoning | 206 | 349 | −143 |
+| 6 Background | 340 | 476 | −136 |
+| 1 Cold open | 84 | 75 | **+9 ok** |
+| 4 Thesis | 99 | 101 | **−2 ok** |
+| 12 Epigram | 26 | 30 | **−4 ok** |
+
+Voice beats hit target. Record beats carry the entire deficit. Prose is cheap;
+sourced fact is expensive.
+
+**To reach 25 minutes:** roughly 12 more timeline entries and 2 more named
+individuals, each with a citation.
 
 ---
 
-## What to examine in the output
+## The strongest fact the research turned up
 
-1. **`out/buffalo_creek_annotated.md`** — beat markers, word counts, per-beat
-   sources. Read this to judge whether the *structure* landed.
-2. **`out/buffalo_creek_narration.txt`** — clean text, TTS-ready. Read this aloud
-   to judge whether it *sounds* like the reference channel.
-3. The **epigram** (beat 12) is the test of whether the format transferred:
-   > *"The rain didn't destroy Buffalo Creek. It just found out what Pittston had built above it."*
-   Compare to the corpus pattern — `not {assumed cause} — {actual cause}`.
+The thesis is no longer "residents weren't warned." It is worse than that:
 
-## Known weaknesses, stated plainly
+> The water had been rising for two days. A company vice president and the police
+> were both told. In the last hours before it broke, **the vice president ordered
+> every effort to warn residents stopped** and told police the dam would hold.
 
-- **Beat 8 is one person.** The corpus averages 3–4. The validator warns about
-  this and it is the single biggest quality gap.
-- **Beat 2 is a placeholder.** No archival audio has been sourced or cleared.
-- **`age: null` on the only person.** Marcum's age isn't in my sources, so it is
-  left null rather than guessed. That is the contract working.
-- The reckoning omits the legislative aftermath (dam-safety legislation) because
-  I could not source it to the standard the schema demands.
+And separately: the only plan that ever existed for Impoundment 3 — holding 132
+million gallons above seventeen inhabited communities — **was a sketch drawn by
+the on-site vice president.**
+
+One restraint worth noting: sources describe "a vice president" who stopped the
+warnings, and separately name Steve Dasovich as the vice president who drew the
+sketch. **I did not merge them.** They may be the same man; nothing I could
+reach says so. The script keeps them separate.
+
+---
+
+## Known weaknesses
+
+- **Beat 8 is two people, not 3–4.** The validator warns. This is the biggest
+  quality gap and it is a sourcing problem, not a writing one.
+- **Beat 2 is a placeholder.** No archival audio sourced or cleared.
+- **Voice is espeak-ng** and sounds like 1990s synthesis. `translate.google.com`
+  and `huggingface.co` are both blocked here, so gTTS and Kokoro cannot run.
+  Kokoro on your machine is a completely different result.
+- **The middle 60% of frame is empty.** Procedural gradients are a placeholder
+  for footage, not a solution.
+- `age: null` on both people — not in my sources, so left null rather than
+  guessed. That is the contract working.
+
+## What to judge
+
+1. **Structure** — does the beat order hold attention for 12 minutes?
+2. **The thesis turn (beat 4)** and **epigram (beat 12)** — did the format transfer?
+3. **Caption pacing** — one caption per sentence, held for its own audio.
+
+Ignore the voice and the backdrops. Both are known placeholders with known fixes.
