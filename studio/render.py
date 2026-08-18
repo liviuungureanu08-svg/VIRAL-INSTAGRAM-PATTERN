@@ -40,6 +40,7 @@ sys.path.insert(0, str(HERE))
 from PIL import Image, ImageDraw, ImageFilter, ImageFont  # noqa: E402
 
 from generator import build  # noqa: E402
+import scenes  # noqa: E402
 
 W, H = 1920, 1080
 FPS = 24
@@ -81,6 +82,66 @@ def find_ffmpeg() -> str:
 
 
 # --------------------------------------------------------------------------
+# Voice direction
+# --------------------------------------------------------------------------
+
+@dataclass
+class Direction:
+    """Prosody for one caption.
+
+    Flat narration is a script problem before it is a TTS problem. A uniform
+    rate and pitch across 163 captions sounds mechanical even through a good
+    voice, so direction is attached here, in the script layer, and each backend
+    maps it onto whatever controls it has. Swapping espeak for Kokoro changes
+    the timbre; it does not lose the performance.
+    """
+    rate: int = 165        # words per minute
+    pitch: int = 40        # 0-99, espeak scale
+    gap: int = 4           # inter-word gap, 10ms units
+    pause_after: float = 0.32
+
+
+# Register per beat, read off the reference corpus: the cold open is slow and
+# low, the stat burst is clipped, the epigram is the slowest line in the film.
+BEAT_REGISTER: dict[int, Direction] = {
+    1:  Direction(rate=150, pitch=34, gap=6, pause_after=0.75),
+    2:  Direction(rate=170, pitch=48, gap=3, pause_after=0.60),
+    3:  Direction(rate=142, pitch=36, gap=14, pause_after=0.80),
+    4:  Direction(rate=152, pitch=34, gap=6, pause_after=0.60),
+    5:  Direction(rate=166, pitch=40, gap=4, pause_after=0.38),
+    6:  Direction(rate=172, pitch=42, gap=3, pause_after=0.30),
+    7:  Direction(rate=168, pitch=40, gap=4, pause_after=0.40),
+    8:  Direction(rate=156, pitch=36, gap=6, pause_after=0.55),
+    9:  Direction(rate=150, pitch=34, gap=8, pause_after=0.85),
+    10: Direction(rate=158, pitch=36, gap=6, pause_after=0.50),
+    11: Direction(rate=166, pitch=40, gap=4, pause_after=0.40),
+    12: Direction(rate=132, pitch=30, gap=16, pause_after=1.60),
+    13: Direction(rate=172, pitch=46, gap=3, pause_after=0.30),
+}
+
+
+def direct(beat: int, text: str, index: int, total: int) -> Direction:
+    """Adjust the beat register for this specific line."""
+    base = BEAT_REGISTER.get(beat, Direction())
+    d = Direction(base.rate, base.pitch, base.gap, base.pause_after)
+
+    words = len(text.split())
+    # The flat outcome lines are the whole effect of beat 8. Slow them down and
+    # leave silence afterwards instead of running straight into the next caption.
+    if words <= 7 and text.rstrip().endswith((".", "!")):
+        d.rate = int(d.rate * 0.86)
+        d.pitch = max(0, d.pitch - 5)
+        d.pause_after = max(d.pause_after, 0.95)
+    # Questions lift slightly.
+    if text.rstrip().endswith("?"):
+        d.pitch = min(99, d.pitch + 8)
+    # Beat 7 accelerates as the wave moves down the hollow.
+    if beat == 7:
+        d.rate = int(d.rate + 12 * (index / max(1, total - 1)))
+    return d
+
+
+# --------------------------------------------------------------------------
 # TTS backends
 # --------------------------------------------------------------------------
 
@@ -89,15 +150,16 @@ class EspeakBackend:
 
     name = "espeak"
 
-    def __init__(self, voice: str = "en-us", wpm: int = 168):
-        self.voice, self.wpm = voice, wpm
+    def __init__(self, voice: str = "en-us"):
+        self.voice = voice
         if not shutil.which("espeak-ng"):
             raise RuntimeError("espeak-ng not installed (apt install espeak-ng)")
 
-    def synth(self, text: str, out: Path) -> Path:
+    def synth(self, text: str, out: Path, d: Direction | None = None) -> Path:
+        d = d or Direction()
         subprocess.run(
-            ["espeak-ng", "-v", self.voice, "-s", str(self.wpm), "-p", "38",
-             "-w", str(out), text],
+            ["espeak-ng", "-v", self.voice, "-s", str(d.rate), "-p", str(d.pitch),
+             "-g", str(d.gap), "-w", str(out), text],
             check=True, capture_output=True,
         )
         return out
@@ -118,11 +180,15 @@ class KokoroBackend:
         self.pipeline = KPipeline(lang_code="a")
         self.voice = voice
 
-    def synth(self, text: str, out: Path) -> Path:
+    def synth(self, text: str, out: Path, d: Direction | None = None) -> Path:
         import numpy as np  # noqa: PLC0415
         import soundfile as sf  # noqa: PLC0415
 
-        chunks = [audio for _, _, audio in self.pipeline(text, voice=self.voice)]
+        d = d or Direction()
+        # Kokoro takes a speed multiplier; map the directed rate onto it.
+        speed = max(0.6, min(1.4, d.rate / 165))
+        chunks = [audio for _, _, audio in
+                  self.pipeline(text, voice=self.voice, speed=speed)]
         sf.write(str(out), np.concatenate(chunks), 24000)
         return out
 
@@ -138,13 +204,16 @@ class ElevenLabsBackend:
             raise RuntimeError("ELEVENLABS_API_KEY not set")
         self.voice_id = voice_id or os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
 
-    def synth(self, text: str, out: Path) -> Path:
+    def synth(self, text: str, out: Path, d: Direction | None = None) -> Path:
         import requests  # noqa: PLC0415
 
+        d = d or Direction()
         response = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{self.voice_id}",
             headers={"xi-api-key": self.key, "Content-Type": "application/json"},
-            json={"text": text, "model_id": "eleven_multilingual_v2"},
+            json={"text": text, "model_id": "eleven_multilingual_v2",
+                  "voice_settings": {"stability": 0.45, "similarity_boost": 0.75,
+                                     "style": 0.35 if d.rate < 150 else 0.15}},
             timeout=90,
         )
         response.raise_for_status()
@@ -210,15 +279,22 @@ def _split_long(sentence: str, limit: int) -> list[str]:
         if len(chunk) <= limit:
             final.append(chunk)
             continue
-        words, cur = chunk.split(), ""
+        # Balance across the needed number of captions rather than filling
+        # greedily. Greedy packing leaves the remainder in the last caption,
+        # which produces a single orphan word on screen — it reads as a bug.
+        words = chunk.split()
+        parts = max(2, -(-len(chunk) // limit))
+        target = len(chunk) / parts
+        cur = ""
         for w in words:
-            if not cur:
-                cur = w
-            elif len(cur) + len(w) + 1 <= limit:
-                cur = f"{cur} {w}"
-            else:
+            if cur and len(cur) + len(w) + 1 > limit:
                 final.append(cur)
                 cur = w
+            elif cur and len(cur) >= target and len(final) < parts - 1:
+                final.append(cur)
+                cur = w
+            else:
+                cur = f"{cur} {w}".strip()
         if cur:
             final.append(cur)
     return final
@@ -306,76 +382,71 @@ def _wrap(draw, text: str, fnt, max_w: int) -> list[str]:
     return lines
 
 
+SCENE_W, SCENE_H = scenes.SW, scenes.SH
+_VIGNETTE = None
+
+
 def _vignette() -> Image.Image:
     """Soft top and bottom darkening as a vertical gradient.
 
-    Drawn as filled rectangles this leaves two hard horizontal seams across the
-    frame, which reads as a rendering fault rather than a design choice. Built as
-    a gradient instead so the falloff is invisible.
+    Drawn as filled rectangles this leaves hard horizontal seams across the
+    frame, which reads as a rendering fault rather than a design choice.
     """
-    strip = Image.new("L", (1, H), 0)
+    strip = Image.new("L", (1, SCENE_H), 0)
     px = strip.load()
-    top_end, bottom_start = int(H * 0.26), int(H * 0.52)
-    for y in range(H):
+    top_end, bottom_start = int(SCENE_H * 0.20), int(SCENE_H * 0.50)
+    for y in range(SCENE_H):
         if y < top_end:
-            alpha = 105 * (1 - y / top_end) ** 1.6
+            alpha = 100 * (1 - y / top_end) ** 1.6
         elif y > bottom_start:
-            t = (y - bottom_start) / (H - bottom_start)
-            alpha = 175 * t ** 1.25
+            t = (y - bottom_start) / (SCENE_H - bottom_start)
+            alpha = 190 * t ** 1.25
         else:
             alpha = 0
         px[0, y] = int(max(0, min(255, alpha)))
-    mask = strip.resize((W, H))
-    shade = Image.new("RGB", (W, H), (0, 0, 0))
-    return Image.merge("RGBA", (*shade.split(), mask))
-
-
-_VIGNETTE_CACHE: Image.Image | None = None
+    shade = Image.new("RGB", (SCENE_W, SCENE_H), (0, 0, 0))
+    return Image.merge("RGBA", (*shade.split(), strip.resize((SCENE_W, SCENE_H))))
 
 
 def render_frame(seg: Segment, index: int, total: int, out: Path) -> Path:
-    global _VIGNETTE_CACHE
-    img = _backdrop(seg.beat, index).convert("RGBA")
+    """Compose one caption over its scene, at scene resolution.
 
-    if _VIGNETTE_CACHE is None:
-        _VIGNETTE_CACHE = _vignette()
-    img = Image.alpha_composite(img, _VIGNETTE_CACHE).convert("RGB")
+    Rendered larger than output so the assembler can pan and zoom inside it.
+    """
+    global _VIGNETTE
+    scene = scenes.choose(seg.beat, seg.text, index, total)
+    img = scenes.render_scene(scene).convert("RGBA")
+
+    if _VIGNETTE is None:
+        _VIGNETTE = _vignette()
+    img = Image.alpha_composite(img, _VIGNETTE).convert("RGB")
     draw = ImageDraw.Draw(img, "RGBA")
 
-    f_label = font(30)
-    f_cap = font(52)
-    f_callout = font(190)
+    k = SCENE_W / W                       # scale factor from output to scene
+    f_label = font(int(30 * k))
+    f_cap = font(int(52 * k))
 
-    # Beat label, top left
-    draw.text((72, 54), f"BEAT {seg.beat} · {seg.beat_name.upper()}",
-              font=f_label, fill=MUTED)
+    draw.text((int(72 * k), int(54 * k)),
+              f"BEAT {seg.beat} · {seg.beat_name.upper()}", font=f_label, fill=MUTED)
 
-    # Large figure callout for the number beats
-    if seg.callout:
-        draw.text((72, int(H * 0.30)), seg.callout, font=f_callout, fill=ACCENT,
-                  stroke_width=3, stroke_fill=(0, 0, 0))
-
-    # Caption block: white text on rounded dark boxes, one box per line,
-    # hugging the text — the style the reference relies on.
-    lines = _wrap(draw, seg.text, f_cap, int(W * 0.74))[:3]
-    line_h = 74
-    block_h = len(lines) * line_h
-    y = int(H * 0.78) - block_h // 2
+    lines = _wrap(draw, seg.text, f_cap, int(SCENE_W * 0.74))[:3]
+    line_h = int(74 * k)
+    y = int(SCENE_H * 0.79) - (len(lines) * line_h) // 2
 
     for line in lines:
         tw = draw.textlength(line, font=f_cap)
-        x = (W - tw) / 2
+        x = (SCENE_W - tw) / 2
         draw.rounded_rectangle(
-            [x - 26, y - 12, x + tw + 26, y + line_h - 20],
-            radius=14, fill=BOX + (216,),
+            [x - 26 * k, y - 12 * k, x + tw + 26 * k, y + line_h - 20 * k],
+            radius=int(14 * k), fill=BOX + (216,),
         )
-        draw.text((x, y - 6), line, font=f_cap, fill=TEXT)
+        draw.text((x, y - 6 * k), line, font=f_cap, fill=TEXT)
         y += line_h
 
-    # Progress bar — cheap, and it signals forward motion on a long runtime.
-    draw.rectangle([0, H - 6, int(W * (index + 1) / max(1, total)), H], fill=ACCENT)
+    draw.rectangle([0, SCENE_H - int(6 * k),
+                    int(SCENE_W * (index + 1) / max(1, total)), SCENE_H], fill=ACCENT)
 
-    img.save(out, quality=92)
+    img.save(out, quality=90)
     return out
 
 
@@ -413,38 +484,44 @@ def _normalise_audio(src: Path, dst: Path, ffmpeg: str, pad: float = SEGMENT_PAD
     return dst
 
 
-def assemble_ffmpeg(frames: list[Path], audios: list[Path], out_path: Path,
-                    ffmpeg: str, workdir: Path) -> Path:
-    """Mux stills and audio in a single ffmpeg pass.
+def _segment_clip(frame: Path, audio: Path, out: Path, duration: float,
+                  index: int, ffmpeg: str) -> Path:
+    """One caption as a short clip with a slow push or pull.
 
-    MoviePy pulls every one of the ~8,000 output frames through Python to
-    composite them, which on this material took 17m26s to produce 5m34s of
-    video. These are still images and the reference format uses hard cuts, so
-    the concat demuxer does the same job in one pass — measured at 36s for the
-    same input, roughly 29x faster.
+    A held still is a slideshow no matter how good the graphic is. zoompan
+    animates inside the oversized scene canvas, so every shot drifts. Direction
+    alternates to avoid a metronome feel.
     """
-    durations = [_audio_duration(a, ffmpeg) for a in audios]
+    frames = max(2, int(round(duration * FPS)))
+    inward = index % 2 == 0
+    zoom = (f"min(1.02+{0.10/frames:.6f}*on,1.12)" if inward
+            else f"max(1.12-{0.10/frames:.6f}*on,1.02)")
+    drift = 70 if (index // 2) % 2 == 0 else -70
+    x = f"iw/2-(iw/zoom/2)+({drift})*on/{frames}"
+    y = "ih/2-(ih/zoom/2)"
 
-    frame_list = workdir / "frames.txt"
-    with frame_list.open("w") as f:
-        for img, dur in zip(frames, durations):
-            f.write(f"file '{img.name}'\nduration {dur:.3f}\n")
-        f.write(f"file '{frames[-1].name}'\n")  # demuxer needs the last entry repeated
+    subprocess.run(
+        [ffmpeg, "-y", "-v", "error", "-loop", "1", "-i", str(frame), "-i", str(audio),
+         "-filter_complex",
+         f"[0:v]zoompan=z='{zoom}':d={frames}:x='{x}':y='{y}':s={W}x{H}:fps={FPS},"
+         f"format=yuv420p[v]",
+         "-map", "[v]", "-map", "1:a",
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+         "-c:a", "aac", "-b:a", "160k", "-shortest", str(out)],
+        check=True, capture_output=True,
+    )
+    return out
 
-    audio_list = workdir / "audio.txt"
-    with audio_list.open("w") as f:
-        for a in audios:
-            f.write(f"file '{a.name}'\n")
 
+def assemble_ffmpeg(clips: list[Path], out_path: Path, ffmpeg: str,
+                    workdir: Path) -> Path:
+    """Join the per-segment clips without re-encoding."""
+    listing = workdir / "clips.txt"
+    listing.write_text("".join(f"file '{c.name}'\n" for c in clips))
     out_path.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        [ffmpeg, "-y", "-v", "error",
-         "-f", "concat", "-safe", "0", "-i", "frames.txt",
-         "-f", "concat", "-safe", "0", "-i", "audio.txt",
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
-         "-pix_fmt", "yuv420p", "-r", str(FPS),
-         "-c:a", "aac", "-b:a", "160k", "-shortest",
-         str(out_path.resolve())],
+        [ffmpeg, "-y", "-v", "error", "-f", "concat", "-safe", "0",
+         "-i", "clips.txt", "-c", "copy", str(out_path.resolve())],
         check=True, cwd=workdir, capture_output=True,
     )
     return out_path
@@ -473,21 +550,21 @@ def render(slots: dict, voice: dict[int, str], out_path: Path,
     backend = BACKENDS[backend_name]()
     print(f"  backend: {backend.name} | assembler: {assembler} | segments: {len(segments)}")
 
-    frames: list[Path] = []
-    audios: list[Path] = []
+    clips: list[Path] = []
     for i, seg in enumerate(segments):
-        raw = backend.synth(seg.text, workdir / f"raw{i:04d}.wav")
-        audios.append(_normalise_audio(raw, workdir / f"a{i:04d}.wav", ffmpeg))
+        d = direct(seg.beat, seg.text, i, len(segments))
+        raw = backend.synth(seg.text, workdir / f"raw{i:04d}.wav", d)
+        audio = _normalise_audio(raw, workdir / f"a{i:04d}.wav", ffmpeg, d.pause_after)
         raw.unlink(missing_ok=True)
-        frames.append(render_frame(seg, i, len(segments), workdir / f"f{i:04d}.jpg"))
-        if (i + 1) % 10 == 0 or i == len(segments) - 1:
+        frame = render_frame(seg, i, len(segments), workdir / f"f{i:04d}.jpg")
+        dur = _audio_duration(audio, ffmpeg)
+        clips.append(_segment_clip(frame, audio, workdir / f"c{i:04d}.mp4",
+                                   dur, i, ffmpeg))
+        frame.unlink(missing_ok=True)
+        if (i + 1) % 20 == 0 or i == len(segments) - 1:
             print(f"    {i+1}/{len(segments)} segments")
 
-    if assembler == "ffmpeg":
-        assemble_ffmpeg(frames, audios, out_path, ffmpeg, workdir)
-    else:
-        _assemble_moviepy(frames, audios, out_path)
-
+    assemble_ffmpeg(clips, out_path, ffmpeg, workdir)
     print(f"  ✅ {out_path} ({out_path.stat().st_size/1_000_000:.1f} MB)")
     return out_path
 
